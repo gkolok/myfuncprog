@@ -77,7 +77,7 @@ class HuffmanSuite extends FunSuite {
 
   test("convert t2") {
     new TestTrees {
-      val expectedCodeTable = List(('a', List(0,0)), ('b', List(0,1)), ('d', List(1)))
+      val expectedCodeTable = List(('a', List(0, 0)), ('b', List(0, 1)), ('d', List(1)))
       assert(convert(t2) === expectedCodeTable)
     }
   }
@@ -105,9 +105,6 @@ class HuffmanSuite extends FunSuite {
       assert(createCodeTree(text.toList) === t1)
       val text2 = "abbab"
       assert(createCodeTree(text2.toList) === t1)
-      val text3 = "dabdbabdd"
-      assert(createCodeTree(text3.toList) === t2)
-      assert(encode(t2)("dba".toList).size === 5)
     }
   }
 
@@ -115,5 +112,11 @@ class HuffmanSuite extends FunSuite {
     val text = "this is an example of a huffman tree"
     val tree = createCodeTree(text.toList)
     assert(decode(tree, quickEncode(tree)(text.toList)) === text.toList)
+  }
+
+  test("insert") {
+    val list = List(Leaf('u',1), Leaf('r',3), Leaf('t','4'))
+    val expected = List(Leaf('u',1), Leaf('x',2), Leaf('r',3), Leaf('t','4'))
+    assert(insert(Leaf('x', 2), list) === expected)
   }
 }
