@@ -70,6 +70,18 @@ object Anagrams {
   /** Returns all the anagrams of a given word. */
   def wordAnagrams(word: Word): List[Word] = dictionaryByOccurrences(wordOccurrences(word))
 
+   def combList(s: List[Int], l: List[Int]): List[List[Int]] = {
+   	l.foldLeft(List(s)) {(m, e) => m ++ List(e :: s)}
+   }
+   
+   def combListList(s: List[List[Int]], l: List[Int]): List[List[Int]] = {
+    s.foldLeft(List[List[Int]]())((m, e) => m ++ combList(e, l))
+   }
+   
+   val occs = List(l1, l2, l3)
+   occs.foldLeft(List[List[Int]](Nil)) {(m, o) =>
+   		combListList(m, o)
+   }
   /** Returns the list of all subsets of the occurrence list.
    *  This includes the occurrence itself, i.e. `List(('k', 1), ('o', 1))`
    *  is a subset of `List(('k', 1), ('o', 1))`.
@@ -92,7 +104,8 @@ object Anagrams {
    *  Note that the order of the occurrence list subsets does not matter -- the subsets
    *  in the example above could have been displayed in some other order.
    */
-  def combinations(occurrences: Occurrences): List[Occurrences] = ???
+  def combinations(occurrences: Occurrences): List[Occurrences] = occurences.foldLeft(List[List[Int]](Nil)) {(m, o) =>
+   		combListList(m, o)}
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
    * 
