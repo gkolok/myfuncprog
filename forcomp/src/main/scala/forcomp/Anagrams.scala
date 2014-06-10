@@ -179,4 +179,29 @@ object Anagrams {
    */
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
 
+/*
+    val sent: Sentence = List("Yes", "man")
+    wordOccurrences(sent.reduceLeft(_+_))
+    val allCombinations = combinations(wordOccurrences(sent.reduceLeft(_+_)))
+    allCombinations.mkString("\n")
+    val allWordOccs = for (o <- allCombinations if (dictionaryByOccurrences.contains(o))) yield dictionaryByOccurrences(o)
+  
+  def theSentenceOcc = sentenceOccurrences(sent)
+  
+	def anagramsFromOccurrences(occurrences: List[Occurrences]): List[Sentence] = occurrences match {
+		case Nil => Nil
+		case occ :: rest => allAnagramsWithWord(occ) ++ anagramsFromOccurrences(rest)
+	}
+
+	def allAnagramsWithWord(occ: Occurrences): List[Sentence] =
+		if (isWord(occ)) allAnagramsWithWordsAcc(List(occ), subtract(theSentenceOcc, occ))
+		else Nil
+		
+	def allAnagramsWithWordsAcc(collectedWords: List[Occurrences], restOfSentenceOcc: Occurrences): List[Sentence] = {
+		if (isWord(occ))
+		else Nil
+	}
+		
+	def isWord(occ: Occurrences) = dictionaryByOccurrences.contains(occ)
+	*/
 }
