@@ -67,7 +67,7 @@ object Anagrams {
     val wo = wordOccurrences(w);
     m + (m.get(wo) match {
       case None => (wo -> List(w))
-      case Some(xs: List[Word]) => (wo -> (w :: xs))
+      case Some(xs) => (wo -> (w :: xs))
     })
   })
 
