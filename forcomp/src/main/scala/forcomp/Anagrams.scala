@@ -63,7 +63,7 @@ object Anagrams {
    *    List(('a', 1), ('e', 1), ('t', 1)) -> Seq("ate", "eat", "tea")
    *
    */
-  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = dictionary.foldRight(new HashMap[Occurrences, List[Word]]())((w, m) => {
+  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = dictionary.foldRight(Map[Occurrences, List[Word]]())((w, m) => {
     val wo = wordOccurrences(w);
     m + (m.get(wo) match {
       case None => (wo -> List(w))
