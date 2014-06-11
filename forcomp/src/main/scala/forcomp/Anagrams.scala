@@ -45,7 +45,7 @@ object Anagrams {
       .toList.sortWith(_._1 < _._1)
 
   /** Converts a sentence into its character occurrence list. */
-  def sentenceOccurrences(s: Sentence): Occurrences = wordOccurrences(s.reduce{_ + _})
+  def sentenceOccurrences(s: Sentence): Occurrences = wordOccurrences(s.reduce { _ + _ })
 
   /**
    * The `dictionaryByOccurrences` is a `Map` from different occurrences to a sequence of all
@@ -126,14 +126,11 @@ object Anagrams {
    *  and has no zero-entries.
    */
   def subtract(x: Occurrences, y: Occurrences): Occurrences = {
-    val xmap = x.foldLeft(Map[Char, Int]()) { (m, o) => m + (o._1 -> o._2) }
-    y.foldLeft(xmap) { (m, o) =>
-      val (char, count) = o
-      m(char) match {
-        case x if (x == count) => m - char
-        case x => m.updated(char, x - count)
-      }
-    }.toList
+    val xmap = x.toMap
+    y.foldLeft(xmap) { (map, occ) =>
+      val (char, count) = occ
+      map.updated(char, map(char) - count)
+    }.toList.filter(_._2 > 0)
   }
 
   /**
@@ -179,29 +176,9 @@ object Anagrams {
    */
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
 
-/*
-    val sent: Sentence = List("Yes", "man")
-    wordOccurrences(sent.reduceLeft(_+_))
-    val allCombinations = combinations(wordOccurrences(sent.reduceLeft(_+_)))
-    allCombinations.mkString("\n")
-    val allWordOccs = for (o <- allCombinations if (dictionaryByOccurrences.contains(o))) yield dictionaryByOccurrences(o)
-  
-  def theSentenceOcc = sentenceOccurrences(sent)
-  
-	def anagramsFromOccurrences(occurrences: List[Occurrences]): List[Sentence] = occurrences match {
-		case Nil => Nil
-		case occ :: rest => allAnagramsWithWord(occ) ++ anagramsFromOccurrences(rest)
-	}
+  def contains(occ1: Occurrences, occ2: Occurrences): Boolean = {
+    val occMap = occ1.toMap.withDefaultValue(-1)
+    occ2.forall { case (c, n) => occMap(c) >= n }
+  }
 
-	def allAnagramsWithWord(occ: Occurrences): List[Sentence] =
-		if (isWord(occ)) allAnagramsWithWordsAcc(List(occ), subtract(theSentenceOcc, occ))
-		else Nil
-		
-	def allAnagramsWithWordsAcc(collectedWords: List[Occurrences], restOfSentenceOcc: Occurrences): List[Sentence] = {
-		if (isWord(occ))
-		else Nil
-	}
-		
-	def isWord(occ: Occurrences) = dictionaryByOccurrences.contains(occ)
-	*/
 }
