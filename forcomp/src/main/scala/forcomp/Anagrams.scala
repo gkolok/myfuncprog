@@ -98,7 +98,7 @@ object Anagrams {
    *  in the example above could have been displayed in some other order.
    */
   def combList(s: Occurrences, l: Occurrences): List[Occurrences] = {
-    l.foldLeft(List(s)) { (m, e) => (e :: s).reverse :: m }
+    l.foldLeft(List(s)) { (m, e) => (e :: s).sortWith(_._1 < _._1) :: m }
   }
 
   def combListList(s: List[Occurrences], l: Occurrences): List[Occurrences] = {
