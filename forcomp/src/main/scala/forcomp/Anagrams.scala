@@ -180,5 +180,24 @@ object Anagrams {
     val occMap = occ1.toMap.withDefaultValue(-1)
     occ2.forall { case (c, n) => occMap(c) >= n }
   }
+/*
+   def anagramsAsOccurrences(sentence: Occurrences, allwords: List[Occurrences], currentAna: List[Occurrences]): List[List[Occurrences]] = {
+    def genForOneWord(wordOcc: Occurrences, sentOcc: Occurrences, currentAna: List[Occurrences]): List[List[Occurrences]] =
+      if (contains(sentOcc, wordOcc)) anagramsAsOccurrences(subtract(sentOcc, wordOcc), allwords, wordOcc :: currentAna)
+      else Nil
 
+    allwords.foldLeft(List[List[Occurrences]]()) { (result, word) =>
+      if (sentence.isEmpty) List(currentAna)
+      else result ++ genForOneWord(word, sentence, currentAna)
+    }
+  }                                               //> anagramsAsOccurrences: (sentence: forcomp.Anagrams.Occurrences, allwords: L
+                                                  //| ist[forcomp.Anagrams.Occurrences], currentAna: List[forcomp.Anagrams.Occurr
+                                                  //| ences])List[List[forcomp.Anagrams.Occurrences]]
+  val anagramsOcc = anagramsAsOccurrences(theSentenceOcc, allWordOccs, List())
+                                                  //> anagramsOcc  : List[List[forcomp.Anagrams.Occurrences]] = List(List(List((e
+                                                  //| ,1), (i,1), (m,1), (s,1))), List(List((i,1), (s,1)), List((e,1), (m,1))), L
+                                                  //| ist(List((e,1), (m,1)), List((i,1), (s,1))))
+ anagramsOcc.foldLeft(Nil) {(result, sentenceOcc) => }                                                  
+ 
+ */
 }
