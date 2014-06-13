@@ -45,7 +45,7 @@ object Anagrams {
       .toList.sortWith(_._1 < _._1)
 
   /** Converts a sentence into its character occurrence list. */
-  def sentenceOccurrences(s: Sentence): Occurrences = wordOccurrences(s.reduce { _ + _ })
+  def sentenceOccurrences(s: Sentence): Occurrences = wordOccurrences(s.foldLeft("") { _ + _ })
 
   /**
    * The `dictionaryByOccurrences` is a `Map` from different occurrences to a sequence of all
@@ -97,12 +97,10 @@ object Anagrams {
    *  Note that the order of the occurrence list subsets does not matter -- the subsets
    *  in the example above could have been displayed in some other order.
    */
-  def combList(s: Occurrences, l: Occurrences): List[Occurrences] = {
-    l.foldLeft(List(s)) { (m, e) => (e :: s).sortWith(_._1 < _._1) :: m }
-  }
 
   def combListList(s: List[Occurrences], l: Occurrences): List[Occurrences] = {
-    s.foldLeft(List[Occurrences]()) { (m, e) => m ++ combList(e, l) }
+	  def combList(s: Occurrences): List[Occurrences] =  l.foldLeft(List(s)) { (m, e) => (e :: s).sortWith(_._1 < _._1) :: m }
+    s.foldLeft(List[Occurrences]()) { (m, occurrences) => m ++ combList(occurrences) }
   }
 
   def combinations(occurrences: Occurrences): List[Occurrences] = {
@@ -111,7 +109,7 @@ object Anagrams {
         for (i <- 1 to n) yield (c, i)
       }
     }.toList.map(_.toList)
-    allOccurances.foldLeft(List[Occurrences](Nil)) { (m, o) => combListList(m, o) }
+    allOccurances.foldLeft(List[Occurrences](Nil)) { (result, occurrences) => combListList(result, occurrences) }
   }
 
   /**
@@ -126,11 +124,9 @@ object Anagrams {
    *  and has no zero-entries.
    */
   def subtract(x: Occurrences, y: Occurrences): Occurrences = {
-    val xmap = x.toMap
-    y.foldLeft(xmap) { (map, occ) =>
-      val (char, count) = occ
-      map.updated(char, map(char) - count)
-    }.toList.filter(_._2 > 0)
+    y.foldLeft(x.toMap) { (map, occ) => val (char, count) = occ;  map.updated(char, map(char) - count) }
+    .toList.filter(_._2 > 0)
+    .sortWith(_._1 < _._1)
   }
 
   /**
@@ -174,30 +170,57 @@ object Anagrams {
    *
    *  Note: There is only one anagram of an empty sentence.
    */
-  def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
+  def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
+    if (sentence.isEmpty) List(Nil)
+    else {
+      val sentOcc = sentenceOccurrences(sentence)
+      val words = combinations(sentOcc).filter(isWord)
+      anagramsAsOccurrences(sentOcc, words, List()).foldLeft(List[Sentence]()) { 
+        (anagrams, occList) => anagrams ++ convertOccurrencesToSentences(occList)
+      }
+    }
+  }
 
+  /**
+   * Generates anagrams as Occurrences from words (given as Occurrences).
+   * currentAna parameter is an accumulator for an anagram.
+   */
+  def anagramsAsOccurrences(sentence: Occurrences, words: List[Occurrences], currentAna: List[Occurrences]): List[List[Occurrences]] = {
+    def genForOneWord(wordOcc: Occurrences, sentOcc: Occurrences, currentAna: List[Occurrences]): List[List[Occurrences]] =
+      if (contains(sentOcc, wordOcc)) anagramsAsOccurrences(subtract(sentOcc, wordOcc), words, wordOcc :: currentAna)
+      else Nil
+
+    words.foldLeft(List[List[Occurrences]]()) { (result, word) =>
+      if (sentence.isEmpty) List(currentAna)
+      else result ++ genForOneWord(word, sentence, currentAna)
+    }
+  }
+
+  /**
+   * Converts one List[Occurences] (which holds an anagram as occurances) to real List of Sentences, which are combinations of words belonging to the Occurrences of the input.
+   */
+  def convertOccurrencesToSentences(occurrencesList: List[Occurrences]): List[Sentence] = {
+    def combine(acc: Sentence, remaining: List[Sentence]): List[Sentence] = remaining match {
+      case Nil => List(acc)
+      case x :: xs => x.foldLeft(List[Sentence]()) { (listOfList, word) => listOfList ++ combine(word :: acc, xs) }
+    }
+    combine(List(), occurrencesList.map(dictionaryByOccurrences))
+  }
+
+  /**
+   * Indicates that occurrence is element of dictionary key set.
+   */
+  def isWord(occ: Occurrences) = dictionaryByOccurrences.contains(occ)
+
+  /**
+   * Returns true if first Occurrences has all characters of the second 
+   * and the corresponding count numbers are not less then the count numbers of the second.
+   * Indicates that second Occurrences can be subtracted from first.
+   *  
+   */
   def contains(occ1: Occurrences, occ2: Occurrences): Boolean = {
     val occMap = occ1.toMap.withDefaultValue(-1)
     occ2.forall { case (c, n) => occMap(c) >= n }
   }
-/*
-   def anagramsAsOccurrences(sentence: Occurrences, allwords: List[Occurrences], currentAna: List[Occurrences]): List[List[Occurrences]] = {
-    def genForOneWord(wordOcc: Occurrences, sentOcc: Occurrences, currentAna: List[Occurrences]): List[List[Occurrences]] =
-      if (contains(sentOcc, wordOcc)) anagramsAsOccurrences(subtract(sentOcc, wordOcc), allwords, wordOcc :: currentAna)
-      else Nil
 
-    allwords.foldLeft(List[List[Occurrences]]()) { (result, word) =>
-      if (sentence.isEmpty) List(currentAna)
-      else result ++ genForOneWord(word, sentence, currentAna)
-    }
-  }                                               //> anagramsAsOccurrences: (sentence: forcomp.Anagrams.Occurrences, allwords: L
-                                                  //| ist[forcomp.Anagrams.Occurrences], currentAna: List[forcomp.Anagrams.Occurr
-                                                  //| ences])List[List[forcomp.Anagrams.Occurrences]]
-  val anagramsOcc = anagramsAsOccurrences(theSentenceOcc, allWordOccs, List())
-                                                  //> anagramsOcc  : List[List[forcomp.Anagrams.Occurrences]] = List(List(List((e
-                                                  //| ,1), (i,1), (m,1), (s,1))), List(List((i,1), (s,1)), List((e,1), (m,1))), L
-                                                  //| ist(List((e,1), (m,1)), List((i,1), (s,1))))
- anagramsOcc.foldLeft(Nil) {(result, sentenceOcc) => }                                                  
- 
- */
 }
